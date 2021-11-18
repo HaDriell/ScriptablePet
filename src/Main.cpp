@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "UI/WidgetManager.h"
 
 int main()
 {
@@ -15,40 +16,60 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow(128, 128, "Yolo Banjo", nullptr,  nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Yolo Banjo", nullptr,  nullptr);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(GL_TRUE);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
 
-    bool show = true;
+    Widget a("Test");
+    Widget b("Test2");
+
+    a.Register();
+    b.Register();
+
+    a.Open();
+    b.Open();
 
     while (!glfwWindowShouldClose(window))
     {
+        // Refresh Inputs
         glfwPollEvents();
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
 
-        ImGui::ShowDemoWindow(&show);
-
-        ImGui::Render();
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-        glClearColor(0, 0, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
+        //Synchronize Framebuffer & OpenGL
+        {
+            int width, height;
+            glfwGetFramebufferSize(window, &width, &height);
+            glViewport(0, 0, width, height);
+            glClearColor(0, 0, 0, 0);
+            glClear(GL_COLOR_BUFFER_BIT);
+        }
+        
+        //Render ImGui Context
+        {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            WidgetManager::GetInstance().Render();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+        
+        // Present Frame
+        glfwSwapBuffers(window); 
     }
+
+    a.Close();
+    b.Close();
+
+    a.Unregister();
+    b.Unregister();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
