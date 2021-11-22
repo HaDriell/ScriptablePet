@@ -20,7 +20,5 @@ private:
 
 // Singleton Declaration
 public:
-    static WidgetManager& GetInstance() { return s_Instance; }
-private:
-    static WidgetManager s_Instance;
+    static WidgetManager& GetInstance();
 };

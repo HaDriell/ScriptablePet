@@ -5,6 +5,9 @@
 #include <GLFW/glfw3.h>
 
 #include "UI/WidgetManager.h"
+#include "UI/MenuManager.h"
+
+
 
 int main()
 {
@@ -28,15 +31,6 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
 
-    Widget a("Test");
-    Widget b("Test2");
-
-    a.Register();
-    b.Register();
-
-    a.Open();
-    b.Open();
-
     while (!glfwWindowShouldClose(window))
     {
         // Refresh Inputs
@@ -56,7 +50,10 @@ int main()
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
+
             WidgetManager::GetInstance().Render();
+            MenuManager::GetInstance().RenderMainMenuBar();
+            
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
@@ -64,12 +61,6 @@ int main()
         // Present Frame
         glfwSwapBuffers(window); 
     }
-
-    a.Close();
-    b.Close();
-
-    a.Unregister();
-    b.Unregister();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

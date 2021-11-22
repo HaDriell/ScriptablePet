@@ -2,9 +2,6 @@
 
 #include <algorithm>
 
-
-WidgetManager WidgetManager::s_Instance;
-
 bool WidgetManager::Register(Widget* widget)
 {
     auto it = m_Widgets.find(widget->GetName());
@@ -39,4 +36,10 @@ void WidgetManager::Render()
     {
         widget->Render();
     }
+}
+
+WidgetManager& WidgetManager::GetInstance()
+{
+    static WidgetManager s_Instance;
+    return s_Instance;
 }
