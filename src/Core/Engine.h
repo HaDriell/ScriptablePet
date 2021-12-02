@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-    void Run(Application* application);
+    int Run(Application* application);
     void Exit(int exitCode = 0);
     float GetDeltaTime();
     Application* GetApplication();

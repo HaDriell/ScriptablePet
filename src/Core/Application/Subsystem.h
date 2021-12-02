@@ -1,18 +1,18 @@
 #pragma once
 
-class IApplication;
+class Application;
 
 class Subsystem
 {
 public:
-    Subsystem(IApplication* application);
     virtual ~Subsystem();
 
     virtual void Initialize() = 0;
     virtual void Shutdown() = 0;
 
-    IApplication* GetApplication() const { return m_Application; }
+    void SetApplication(Application* application) { m_Application = application; }
+    Application* GetApplication() const { return m_Application; }
 
 private:
-    IApplication* m_Application;
+    Application* m_Application;
 };

@@ -1,4 +1,4 @@
-#include "UI/Window/WindowChannel.h"
+#include "Window/WindowChannel.h"
 
 EventChannel& WindowChannel::GetChannel()
 {

@@ -3,20 +3,20 @@
 #include <memory>
 
 #include "Core/Event/Event.h"
-#include "UI/Window/Window.h"
-#include "UI/Window/WindowChannel.h"
+#include "Window/Window.h"
+#include "Window/WindowChannel.h"
 
 
 class WindowEvent : public IEvent
 {
 public:
-    const std::shared_ptr<Window>& GetWindow() const { return m_Window; }
-    void SetWindow(const std::shared_ptr<Window>& window) { m_Window = window; }
+    const Window* GetWindow() const { return m_Window; }
+    void SetWindow(Window* window) { m_Window = window; }
 
     void Broadcast() { IEvent::Broadcast(WindowChannel::GetChannel()); }
 
 private:
-    std::shared_ptr<Window> m_Window;
+    Window* m_Window;
 };
 
 class OpenWindowRequest : public WindowEvent

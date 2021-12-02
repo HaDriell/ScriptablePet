@@ -13,7 +13,7 @@ namespace Engine
 
     constexpr int FrameRate = 60;
 
-    void Run(Application* application)
+    int Run(Application* application)
     {
         assert(s_Application == nullptr);
         assert(application != nullptr);
@@ -38,8 +38,9 @@ namespace Engine
         }
 
         s_Application->Stop();
-
         s_Application = nullptr;
+        
+        return s_ExitCode;
     }
 
     void Exit(int exitCode)

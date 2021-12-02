@@ -2,15 +2,16 @@
 
 #include "Core/Engine.h"
 
+#include "Window/WindowSubsystem.h"
+
 class ExampleApplication : public Application
 {
 protected:
-    void InitializeSubSystems(SubsystemContainer& registry) override
+    void InitializeSubSystems(SubsystemContainer& container) override
     {
-        //Nothing here yet
+        container.RegisterManaged<WindowSubsystem>();
     }
 };
-
 
 int main()
 {

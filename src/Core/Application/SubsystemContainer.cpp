@@ -24,3 +24,15 @@ bool SubsystemContainer::Unregister(Subsystem* subsystem)
     }
     return false;
 }
+
+void SubsystemContainer::UnregisterManagedSubsystems()
+{
+    for (Subsystem* subsystem : m_ManagedSubsystems)
+    {
+        if (Unregister(subsystem))
+        {
+            delete subsystem;
+        }
+    }
+    m_Subsystems.clear();
+}

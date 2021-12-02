@@ -1,37 +1,46 @@
-#include "UI/Window/WindowManager.h"
+#include "Window/WindowSubsystem.h"
 
 #include <GLFW/glfw3.h>
 
-#include "UI/Window/WindowChannel.h"
+#include "Window/WindowChannel.h"
 
-void WindowManager::Initialize()
+void WindowSubsystem::Initialize()
 {
     glfwInit();
 
-    m_OpenWindowCallback.Init(this, &WindowManager::HandleOpenWindowRequest);
-    m_CloseWindowCallback.Init(this, &WindowManager::HandleCloseWindowRequest);
+    m_OpenWindowCallback.Init(this, &WindowSubsystem::HandleOpenWindowRequest);
+    m_CloseWindowCallback.Init(this, &WindowSubsystem::HandleCloseWindowRequest);
+    m_ApplicationUpdatedCallback.Init(this, &WindowSubsystem::HandleApplicationUpdatedEvent);
+
     m_EventListener.ConnectHandler(&m_OpenWindowCallback);
     m_EventListener.ConnectHandler(&m_CloseWindowCallback);
+    m_EventListener.ConnectHandler(&m_ApplicationUpdatedCallback);
+
     m_EventListener.JoinChannel(WindowChannel::GetChannel());
 }
 
-void WindowManager::Shutdown()
+void WindowSubsystem::Shutdown()
 {
     m_EventListener.LeaveChannel(WindowChannel::GetChannel());
+
     m_EventListener.DisconnectHandler(&m_OpenWindowCallback);
     m_EventListener.DisconnectHandler(&m_CloseWindowCallback);
+    m_EventListener.DisconnectHandler(&m_ApplicationUpdatedCallback);
+
     m_OpenWindowCallback.Reset();
     m_CloseWindowCallback.Reset();
+    m_ApplicationUpdatedCallback.Reset();
 
     glfwTerminate();
 }
 
-void WindowManager::Update()
+void WindowSubsystem::Update()
 {
     glfwPollEvents();
-
-    for (auto window : m_ManagedWindows)
+    
+    for (GLFWwindow* handle : m_Windows)
     {
+        Window* window = (Window*) glfwGetWindowUserPointer(handle);
         window->BeginFrame();
 
         WindowRenderEvent event;
@@ -42,7 +51,7 @@ void WindowManager::Update()
     }
 }
 
-void WindowManager::HandleOpenWindowRequest(const OpenWindowRequest& event)
+void WindowSubsystem::HandleOpenWindowRequest(const OpenWindowRequest& event)
 {
     if (event.GetWindow()->GetHandle() != nullptr)
     {
@@ -57,14 +66,12 @@ void WindowManager::HandleOpenWindowRequest(const OpenWindowRequest& event)
 
 }
 
-void WindowManager::HandleCloseWindowRequest(const CloseWindowRequest& event)
+void WindowSubsystem::HandleCloseWindowRequest(const CloseWindowRequest& event)
 {
 
 }
 
-
-WindowManager& WindowManager::GetInstance()
+void WindowSubsystem::HandleApplicationUpdatedEvent(const ApplicationUpdatedEvent& event)
 {
-    static WindowManager instance;
-    return instance;
+    
 }

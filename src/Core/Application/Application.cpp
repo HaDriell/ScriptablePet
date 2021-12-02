@@ -3,7 +3,6 @@
 #include "Core/Application/ApplicationEvents.h"
 #include "Core/Application/ApplicationChannel.h"
 
-#include <iostream>
 #include "Core/Engine.h"
 
 Application::~Application()
@@ -26,7 +25,6 @@ void Application::Start()
 
 void Application::Update()
 {
-    std::cout << "DeltaTime " << Engine::GetDeltaTime() << std::endl;
     ApplicationUpdatedEvent event;
     event.SetApplication(this);
     event.Broadcast();
@@ -34,12 +32,14 @@ void Application::Update()
 
 void Application::Stop()
 {
+    ApplicationStoppedEvent event;
+    event.SetApplication(this);
+    event.Broadcast();
+
     for (Subsystem* subsystem : m_SubsystemContainer.GetSubsystems())
     {
         subsystem->Shutdown();
     }
-
-    ApplicationStoppedEvent event;
-    event.SetApplication(this);
-    event.Broadcast();
+    
+    m_SubsystemContainer.UnregisterManagedSubsystems();
 }

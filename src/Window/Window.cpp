@@ -1,4 +1,4 @@
-#include "UI/Window/Window.h"
+#include "Window/Window.h"
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -16,6 +16,7 @@ void Window::Create(const WindowHints& hints)
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
     m_Handle = glfwCreateWindow(hints.Width, hints.Height, hints.Title.c_str(), nullptr,  nullptr);
+    glfwSetWindowUserPointer(m_Handle, this);
     glfwMakeContextCurrent(m_Handle);
     glfwSwapInterval(GLFW_TRUE);
 
@@ -35,6 +36,15 @@ void Window::Create(const WindowHints& hints)
     ImGui_ImplGlfw_InitForOpenGL(m_Handle, true);
     ImGui_ImplOpenGL3_Init("#version 150");
 }
+
+void Window::Destroy()
+{
+    ImGui::DestroyContext(m_ImGuiContext);
+    glfwDestroyWindow(m_Handle);
+    m_Handle = nullptr;
+    m_ImGuiContext = nullptr;
+}
+
 
 void Window::BeginFrame()
 {
@@ -67,12 +77,4 @@ void Window::EndFrame()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
     glfwSwapBuffers(m_Handle);
-}
-
-void Window::Destroy()
-{
-    ImGui::DestroyContext(m_ImGuiContext);
-    glfwDestroyWindow(m_Handle);
-    m_Handle = nullptr;
-    m_ImGuiContext = nullptr;
 }

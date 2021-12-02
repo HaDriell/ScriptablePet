@@ -18,15 +18,14 @@ struct WindowHints
 
 class Window
 {
-    friend class WindowManager;
 public:
     GLFWwindow* GetHandle() const { return m_Handle; }
 
-private:
     void Create(const WindowHints& hints);
+    void Destroy();
+
     void BeginFrame();
     void EndFrame();
-    void Destroy();
 
 private:
     GLFWwindow* m_Handle{ nullptr };
