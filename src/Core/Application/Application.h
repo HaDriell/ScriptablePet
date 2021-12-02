@@ -19,7 +19,7 @@ public:
     template<class SUBSYSTEM>
     SUBSYSTEM* GetSubsystem() const
     {
-        return m_SubsystemContainer.GetSubSystem<SUBSYSTEM>();
+        return m_SubsystemContainer.GetSubsystem<SUBSYSTEM>();
     }
 
 protected:

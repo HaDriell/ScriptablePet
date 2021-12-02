@@ -1,77 +1,113 @@
 #include "Window/WindowSubsystem.h"
 
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Window/WindowChannel.h"
+#include "Core/Application/ApplicationChannel.h"
 
 void WindowSubsystem::Initialize()
 {
     glfwInit();
 
-    m_OpenWindowCallback.Init(this, &WindowSubsystem::HandleOpenWindowRequest);
-    m_CloseWindowCallback.Init(this, &WindowSubsystem::HandleCloseWindowRequest);
     m_ApplicationUpdatedCallback.Init(this, &WindowSubsystem::HandleApplicationUpdatedEvent);
 
-    m_EventListener.ConnectHandler(&m_OpenWindowCallback);
-    m_EventListener.ConnectHandler(&m_CloseWindowCallback);
     m_EventListener.ConnectHandler(&m_ApplicationUpdatedCallback);
 
-    m_EventListener.JoinChannel(WindowChannel::GetChannel());
+    m_EventListener.JoinChannel(ApplicationChannel::GetChannel());
 }
 
 void WindowSubsystem::Shutdown()
 {
-    m_EventListener.LeaveChannel(WindowChannel::GetChannel());
+    m_EventListener.LeaveChannel(ApplicationChannel::GetChannel());
 
-    m_EventListener.DisconnectHandler(&m_OpenWindowCallback);
-    m_EventListener.DisconnectHandler(&m_CloseWindowCallback);
     m_EventListener.DisconnectHandler(&m_ApplicationUpdatedCallback);
 
-    m_OpenWindowCallback.Reset();
-    m_CloseWindowCallback.Reset();
     m_ApplicationUpdatedCallback.Reset();
 
     glfwTerminate();
 }
 
-void WindowSubsystem::Update()
+Window* WindowSubsystem::CreateWindow(const WindowHints& hints)
 {
-    glfwPollEvents();
-    
-    for (GLFWwindow* handle : m_Windows)
-    {
-        Window* window = (Window*) glfwGetWindowUserPointer(handle);
-        window->BeginFrame();
-
-        WindowRenderEvent event;
-        event.SetWindow(window);
-        event.Broadcast();
-
-        window->EndFrame();
-    }
-}
-
-void WindowSubsystem::HandleOpenWindowRequest(const OpenWindowRequest& event)
-{
-    if (event.GetWindow()->GetHandle() != nullptr)
-    {
-        return;
-    }
+    Window* window = new Window();
 
     glfwDefaultWindowHints();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
+    window->m_Handle = glfwCreateWindow(hints.Width, hints.Height, hints.Title.c_str(), nullptr,  nullptr);
+    glfwSetWindowUserPointer(window->m_Handle, this);
+    glfwMakeContextCurrent(window->m_Handle);
+    glfwSwapInterval(GLFW_TRUE);
+
+    //GLAD loads the driver functions once per runtime
+    static bool loadOpenGL = true;
+    if (loadOpenGL)
+    {
+        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        loadOpenGL = false;
+    }
+
+    IMGUI_CHECKVERSION();
+    window->m_ImGuiContext = ImGui::CreateContext();
+    ImGui::SetCurrentContext(window->m_ImGuiContext);
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window->m_Handle, true);
+    ImGui_ImplOpenGL3_Init("#version 150");
+    m_Windows.push_back(window);
+
+    return window;
 }
 
-void WindowSubsystem::HandleCloseWindowRequest(const CloseWindowRequest& event)
+void WindowSubsystem::DestroyWindow(Window* window)
 {
-
+    glfwDestroyWindow(window->m_Handle);
+    ImGui::DestroyContext(window->m_ImGuiContext);
 }
 
 void WindowSubsystem::HandleApplicationUpdatedEvent(const ApplicationUpdatedEvent& event)
 {
+    glfwPollEvents();
     
+    for (Window* window : m_Windows)
+    {
+        //Skip render on hidden Windows
+        if (glfwGetWindowAttrib(window->GetHandle(), GLFW_VISIBLE) == GLFW_FALSE)
+        {
+            continue;
+        }
+
+        glfwMakeContextCurrent(window->GetHandle());
+        ImGui::SetCurrentContext(window->GetImGuiContext());
+
+        { // Update Window Viewport
+            int width, height;
+            glfwGetFramebufferSize(window->GetHandle(), &width, &height);
+            glViewport(0, 0, width, height);
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+        }
+
+        { // Render Frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            WindowRenderEvent event;
+            event.SetWindow(window);
+            event.Broadcast();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+
+        glfwSwapBuffers(window->GetHandle());
+    }
 }

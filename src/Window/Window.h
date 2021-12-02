@@ -8,11 +8,11 @@ struct GLFWwindow;
 
 struct WindowHints
 {
-    std::string     Title;
-    uint32_t        X;
-    uint32_t        Y;
-    uint32_t        Width;
-    uint32_t        Height;
+    std::string     Title = "Window";
+    int32_t         X = 0;
+    int32_t         Y = 0;
+    uint32_t        Width = 800;
+    uint32_t        Height = 450;
 };
 
 
@@ -20,14 +20,17 @@ class Window
 {
 public:
     GLFWwindow* GetHandle() const { return m_Handle; }
+    ImGuiContext* GetImGuiContext() const { return m_ImGuiContext; }
 
-    void Create(const WindowHints& hints);
-    void Destroy();
-
-    void BeginFrame();
-    void EndFrame();
+    void SetTitle(const std::string& title);
+    void Hide();
+    void Show();
+    void Iconify();
+    void Maximize();
 
 private:
     GLFWwindow* m_Handle{ nullptr };
     ImGuiContext* m_ImGuiContext{ nullptr };
+
+    friend class WindowSubsystem;
 };

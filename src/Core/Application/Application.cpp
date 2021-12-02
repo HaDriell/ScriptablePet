@@ -15,6 +15,7 @@ void Application::Start()
 
     for (Subsystem* subsystem : m_SubsystemContainer.GetSubsystems())
     {
+        subsystem->SetApplication(this);
         subsystem->Initialize();
     }
 
@@ -39,6 +40,7 @@ void Application::Stop()
     for (Subsystem* subsystem : m_SubsystemContainer.GetSubsystems())
     {
         subsystem->Shutdown();
+        subsystem->SetApplication(nullptr);
     }
     
     m_SubsystemContainer.UnregisterManagedSubsystems();

@@ -19,20 +19,6 @@ private:
     Window* m_Window;
 };
 
-class OpenWindowRequest : public WindowEvent
-{
-public:
-    const WindowHints& GetWindowHints() const { return m_WindowHints; }
-    void SetWindowHints(const WindowHints& windowHints) { m_WindowHints = windowHints; }
-
-private:
-    WindowHints m_WindowHints;
-};
-
-class CloseWindowRequest : public WindowEvent
-{
-};
-
 class WindowRenderEvent : public WindowEvent
 {
 };
