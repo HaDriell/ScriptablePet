@@ -4,9 +4,8 @@
 
 namespace Engine
 {
-    void SetApplication(Application* application);
+    void Run(Application* application);
+    void Exit(int exitCode = 0);
+    float GetDeltaTime();
     Application* GetApplication();
-
-    void Start();
-    void Stop();
 }

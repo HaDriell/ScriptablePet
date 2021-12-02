@@ -15,6 +15,5 @@ protected:
 int main()
 {
     ExampleApplication application;
-    Engine::SetApplication(&application);
-    Engine::Start();
+    Engine::Run(&application);
 }

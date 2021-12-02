@@ -11,7 +11,7 @@ public:
     virtual ~Application();
 
     void Start();
-    void Update(float deltaTime);
+    void Update();
     void Stop();
 
     const std::vector<Subsystem*>& GetSubSystems() const { return m_SubsystemContainer.GetSubsystems(); }

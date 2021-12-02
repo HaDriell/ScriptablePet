@@ -22,6 +22,10 @@ class ApplicationStartedEvent : public ApplicationEvent
 {
 };
 
+class ApplicationUpdatedEvent : public ApplicationEvent
+{
+};
+
 class ApplicationStoppedEvent : public ApplicationEvent
 {
 };
