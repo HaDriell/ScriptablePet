@@ -2,6 +2,26 @@
 
 #include <algorithm>
 
+#include "UI/UIChannel.h"
+
+
+void WidgetManager::Initialize()
+{
+    m_WidgetOpenedCallback.Init(this, &WidgetManager::HandleWidgetOpenedEvent);
+    m_WidgetClosedCallback.Init(this, &WidgetManager::HandleWidgetClosedEvent);
+
+    m_EventListener.ConnectHandler(&m_WidgetOpenedCallback);
+    m_EventListener.ConnectHandler(&m_WidgetClosedCallback);
+    m_EventListener.JoinChannel(UIChannel::GetChannel());
+}
+
+void WidgetManager::Shutdown()
+{
+    m_EventListener.LeaveChannel(UIChannel::GetChannel());
+    m_WidgetOpenedCallback.Reset();
+    m_WidgetClosedCallback.Reset();
+}
+
 bool WidgetManager::Register(Widget* widget)
 {
     auto it = m_Widgets.find(widget->GetName());
@@ -38,8 +58,18 @@ void WidgetManager::Render()
     }
 }
 
+void WidgetManager::HandleWidgetOpenedEvent(const WidgetOpenedEvent& event)
+{
+
+}
+
+void WidgetManager::HandleWidgetClosedEvent(const WidgetClosedEvent& event)
+{
+
+}
+
 WidgetManager& WidgetManager::GetInstance()
 {
-    static WidgetManager s_Instance;
-    return s_Instance;
+    static WidgetManager instance;
+    return instance;
 }
