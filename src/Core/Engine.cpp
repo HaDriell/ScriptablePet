@@ -46,6 +46,7 @@ namespace Engine
     void Exit(int exitCode)
     {
         s_ExitCode = exitCode;
+        s_Running = false;
     }
 
     float GetDeltaTime()

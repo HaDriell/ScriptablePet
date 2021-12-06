@@ -22,3 +22,7 @@ private:
 class WindowRenderEvent : public WindowEvent
 {
 };
+
+class WindowVisibilityChangedEvent : public WindowEvent
+{
+};

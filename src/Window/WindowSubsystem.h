@@ -27,6 +27,9 @@ public:
 
 private:
     void HandleApplicationUpdatedEvent(const ApplicationUpdatedEvent& event);
+    void RenderWindows();
+    void UpdateWindowVisiblity(Window* window);
+    void RenderWindow(Window* window);
 
 private:
     EventCallback<WindowSubsystem, ApplicationUpdatedEvent> m_ApplicationUpdatedCallback;

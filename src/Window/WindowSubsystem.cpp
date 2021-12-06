@@ -74,20 +74,57 @@ void WindowSubsystem::DestroyWindow(Window* window)
 
 void WindowSubsystem::HandleApplicationUpdatedEvent(const ApplicationUpdatedEvent& event)
 {
+    RenderWindows();
+}
+
+void WindowSubsystem::RenderWindows()
+{
     glfwPollEvents();
     
     for (Window* window : m_Windows)
     {
-        //Skip render on hidden Windows
-        if (glfwGetWindowAttrib(window->GetHandle(), GLFW_VISIBLE) == GLFW_FALSE)
+        UpdateWindowVisiblity(window);
+        RenderWindow(window);
+
+        if (window->ShouldClose())
         {
+             // For now, I don't know how to handle a Window that wants to close itself. I hide it instead.
+            window->SetVisible(false);
             continue;
         }
+    }
+}
 
+void WindowSubsystem::UpdateWindowVisiblity(Window* window)
+{
+    //Delayed Visibility Update
+    bool currentVisibility = (glfwGetWindowAttrib(window->m_Handle, GLFW_VISIBLE) == GLFW_TRUE);
+    if (window->IsVisible() != currentVisibility)
+    {
+        if (window->IsVisible())
+        {
+            glfwShowWindow(window->m_Handle);
+        }
+        else
+        {
+            glfwHideWindow(window->m_Handle);
+        }
+
+        WindowVisibilityChangedEvent event;
+        event.SetWindow(window);
+        event.Broadcast();
+    }
+}
+
+void WindowSubsystem::RenderWindow(Window* window)
+{
+    if (window->IsVisible())
+    {
         glfwMakeContextCurrent(window->GetHandle());
         ImGui::SetCurrentContext(window->GetImGuiContext());
-
-        { // Update Window Viewport
+        
+        // Update Window Viewport
+        {
             int width, height;
             glfwGetFramebufferSize(window->GetHandle(), &width, &height);
             glViewport(0, 0, width, height);
@@ -95,19 +132,19 @@ void WindowSubsystem::HandleApplicationUpdatedEvent(const ApplicationUpdatedEven
             glClear(GL_COLOR_BUFFER_BIT);
         }
 
-        { // Render Frame
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
+        // Render Frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        {
             WindowRenderEvent event;
             event.SetWindow(window);
             event.Broadcast();
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window->GetHandle());
     }
 }
+

@@ -22,15 +22,20 @@ public:
     GLFWwindow* GetHandle() const { return m_Handle; }
     ImGuiContext* GetImGuiContext() const { return m_ImGuiContext; }
 
+    bool IsVisible() const;
+    bool ShouldClose() const;
+
     void SetTitle(const std::string& title);
-    void Hide();
-    void Show();
+    void SetPosition(int32_t x, int32_t y);
+    void SetSize(uint32_t width, uint32_t height);
+    void SetVisible(bool visible);
     void Iconify();
     void Maximize();
 
 private:
     GLFWwindow* m_Handle{ nullptr };
     ImGuiContext* m_ImGuiContext{ nullptr };
+    bool m_Visible{ false };
 
     friend class WindowSubsystem;
 };
