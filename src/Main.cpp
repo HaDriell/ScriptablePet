@@ -2,6 +2,7 @@
 
 #include "Core/Engine.h"
 
+#include "ScriptablePet/ScriptablePetSubsystem.h"
 #include "Window/WindowSubsystem.h"
 #include "Window/WindowChannel.h"
 
@@ -50,18 +51,19 @@ private:
     Window* m_Window;
 };
 
-class ExampleApplication : public Application
+class MainApplication : public Application
 {
 protected:
     void InitializeSubSystems(SubsystemContainer& container) override
     {
         container.RegisterManaged<WindowSubsystem>();
+        container.RegisterManaged<ScriptablePetSubsystem>();
         container.RegisterManaged<MainSubsystem>();
     }
 };
 
 int main()
 {
-    ExampleApplication application;
+    MainApplication application;
     return Engine::Run(&application);
 }
