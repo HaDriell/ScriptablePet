@@ -24,3 +24,6 @@ target_include_directories(imgui
 PUBLIC
     "ImGui"
 )
+
+# JSON
+add_subdirectory(JSON)

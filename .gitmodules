@@ -4,3 +4,6 @@
 [submodule "extern/ImGui"]
 	path = extern/ImGui
 	url = https://github.com/ocornut/imgui.git
+[submodule "extern/JSON"]
+	path = extern/JSON
+	url = https://github.com/nlohmann/json.git
