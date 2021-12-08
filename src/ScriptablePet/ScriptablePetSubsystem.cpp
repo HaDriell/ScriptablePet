@@ -8,15 +8,28 @@ using json = nlohmann::json;
 void ScriptablePetSubsystem::Initialize()
 {
     std::ifstream file("pet.json");
-    json data;
-    file >> data;
-    m_Pet.Load(data);
+    if (file.is_open())
+    {
+        json data;
+        file >> data;
+        m_Pet.Load(data);
+    }
+
+    //TODO : Clean-up that silly test
+    if (m_Pet.GetBlackboard().IsDefined("Answer"))
+    {
+        int32_t ans = m_Pet.GetBlackboard().GetInteger("Answer");
+        m_Pet.GetBlackboard().SetInteger("Answer", ans + 1);
+    }
 }
 
 void ScriptablePetSubsystem::Shutdown()
 {
     std::ofstream file("pet.json");
-    json data;
-    m_Pet.Save(data);
-    file << data;
+    if (file.is_open())
+    {
+        json data;
+        m_Pet.Save(data);
+        file << data;
+    }
 }
