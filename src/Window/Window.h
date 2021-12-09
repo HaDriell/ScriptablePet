@@ -19,7 +19,10 @@ struct WindowHints
 class Window
 {
 public:
+    void SetHandle(GLFWwindow* window) { m_Handle = window; }
     GLFWwindow* GetHandle() const { return m_Handle; }
+
+    void SetImGuiContext(ImGuiContext* context) { m_ImGuiContext = context; }
     ImGuiContext* GetImGuiContext() const { return m_ImGuiContext; }
 
     bool IsVisible() const;
@@ -36,6 +39,4 @@ private:
     GLFWwindow* m_Handle{ nullptr };
     ImGuiContext* m_ImGuiContext{ nullptr };
     bool m_Visible{ false };
-
-    friend class WindowSubsystem;
 };

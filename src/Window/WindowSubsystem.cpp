@@ -41,9 +41,11 @@ Window* WindowSubsystem::CreateWindow(const WindowHints& hints)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-    window->m_Handle = glfwCreateWindow(hints.Width, hints.Height, hints.Title.c_str(), nullptr,  nullptr);
-    glfwSetWindowUserPointer(window->m_Handle, this);
-    glfwMakeContextCurrent(window->m_Handle);
+    GLFWwindow* handle = glfwCreateWindow(hints.Width, hints.Height, hints.Title.c_str(), nullptr,  nullptr);
+    glfwSetWindowUserPointer(handle, window);
+    window->SetHandle(handle);
+
+    glfwMakeContextCurrent(handle);
     glfwSwapInterval(GLFW_TRUE);
 
     //GLAD loads the driver functions once per runtime
@@ -55,11 +57,11 @@ Window* WindowSubsystem::CreateWindow(const WindowHints& hints)
     }
 
     IMGUI_CHECKVERSION();
-    window->m_ImGuiContext = ImGui::CreateContext();
-    ImGui::SetCurrentContext(window->m_ImGuiContext);
+    window->SetImGuiContext(ImGui::CreateContext());
+    ImGui::SetCurrentContext(window->GetImGuiContext());
     ImGui::StyleColorsDark();
 
-    ImGui_ImplGlfw_InitForOpenGL(window->m_Handle, true);
+    ImGui_ImplGlfw_InitForOpenGL(handle, true);
     ImGui_ImplOpenGL3_Init("#version 150");
     m_Windows.push_back(window);
 
@@ -68,8 +70,8 @@ Window* WindowSubsystem::CreateWindow(const WindowHints& hints)
 
 void WindowSubsystem::DestroyWindow(Window* window)
 {
-    glfwDestroyWindow(window->m_Handle);
-    ImGui::DestroyContext(window->m_ImGuiContext);
+    glfwDestroyWindow(window->GetHandle());
+    ImGui::DestroyContext(window->GetImGuiContext());
 }
 
 void WindowSubsystem::HandleApplicationUpdatedEvent(const ApplicationUpdatedEvent& event)
@@ -79,10 +81,13 @@ void WindowSubsystem::HandleApplicationUpdatedEvent(const ApplicationUpdatedEven
 
 void WindowSubsystem::RenderWindows()
 {
-    glfwPollEvents();
     
     for (Window* window : m_Windows)
     {
+        glfwMakeContextCurrent(window->GetHandle());
+        ImGui::SetCurrentContext(window->GetImGuiContext());
+        glfwPollEvents();
+
         UpdateWindowVisiblity(window);
         RenderWindow(window);
 
@@ -98,16 +103,16 @@ void WindowSubsystem::RenderWindows()
 void WindowSubsystem::UpdateWindowVisiblity(Window* window)
 {
     //Delayed Visibility Update
-    bool currentVisibility = (glfwGetWindowAttrib(window->m_Handle, GLFW_VISIBLE) == GLFW_TRUE);
+    bool currentVisibility = (glfwGetWindowAttrib(window->GetHandle(), GLFW_VISIBLE) == GLFW_TRUE);
     if (window->IsVisible() != currentVisibility)
     {
         if (window->IsVisible())
         {
-            glfwShowWindow(window->m_Handle);
+            glfwShowWindow(window->GetHandle());
         }
         else
         {
-            glfwHideWindow(window->m_Handle);
+            glfwHideWindow(window->GetHandle());
         }
 
         WindowVisibilityChangedEvent event;
@@ -120,9 +125,6 @@ void WindowSubsystem::RenderWindow(Window* window)
 {
     if (window->IsVisible())
     {
-        glfwMakeContextCurrent(window->GetHandle());
-        ImGui::SetCurrentContext(window->GetImGuiContext());
-        
         // Update Window Viewport
         {
             int width, height;
