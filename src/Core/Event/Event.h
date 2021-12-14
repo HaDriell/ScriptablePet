@@ -8,5 +8,5 @@ class IEvent
 public:
     virtual ~IEvent() = default;
 
-    void Broadcast(EventChannel& channel) const;
+    void Broadcast(const EventChannel& channel) const;
 };

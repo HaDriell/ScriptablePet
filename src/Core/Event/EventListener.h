@@ -10,7 +10,7 @@
 class EventListener
 {
 public:
-    void Call(const IEvent& event);
+    void Call(const IEvent& event) const;
 
     bool ConnectHandler(IEventHandler* eventHandler);
     bool DisconnectHandler(IEventHandler* eventHandler);
@@ -20,5 +20,4 @@ public:
 
 private:
     std::vector<IEventHandler*> m_EventHandlers;
-    bool m_Dispatching = false;
 };

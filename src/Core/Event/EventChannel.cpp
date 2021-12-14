@@ -5,19 +5,16 @@
 
 #include "Core/Event/EventListener.h"
 
-void EventChannel::Broadcast(const IEvent& event)
+void EventChannel::Broadcast(const IEvent& event) const
 {
-    m_Distaptching = true;
-    for (EventListener* eventListener : m_EventListeners)
+    for (const EventListener* eventListener : m_EventListeners)
     {
         eventListener->Call(event);
     }
-    m_Distaptching = false;
 }
 
-bool EventChannel::AddListener(EventListener* eventListener)
+bool EventChannel::AddListener(const EventListener* eventListener)
 {
-    assert(!m_Distaptching);
     auto it = std::find(m_EventListeners.begin(), m_EventListeners.end(), eventListener);
     if (it == m_EventListeners.end())
     {
@@ -27,9 +24,8 @@ bool EventChannel::AddListener(EventListener* eventListener)
     return false;
 }
 
-bool EventChannel::RemoveListener(EventListener* eventListener)
+bool EventChannel::RemoveListener(const EventListener* eventListener)
 {
-    assert(!m_Distaptching);
     auto it = std::find(m_EventListeners.begin(), m_EventListeners.end(), eventListener);
     if (it != m_EventListeners.end())
     {

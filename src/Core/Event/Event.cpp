@@ -3,7 +3,7 @@
 #include "Core/Event/EventChannel.h"
 
 
-void IEvent::Broadcast(EventChannel& channel) const
+void IEvent::Broadcast(const EventChannel& channel) const
 {
     channel.Broadcast(*this);
 }

@@ -9,11 +9,10 @@ class EventListener;
 class EventChannel
 {
 public:
-    void Broadcast(const IEvent& event);
-    bool AddListener(EventListener* eventListener);
-    bool RemoveListener(EventListener* eventListener);
+    void Broadcast(const IEvent& event) const;
+    bool AddListener(const EventListener* eventListener);
+    bool RemoveListener(const EventListener* eventListener);
 
 private:
-    std::vector<EventListener*> m_EventListeners;
-    bool m_Distaptching = false;
+    std::vector<const EventListener*> m_EventListeners;
 };
