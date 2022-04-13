@@ -10,6 +10,8 @@
 class ScriptablePet
 {
 public:
+    ~ScriptablePet();
+    
     Blackboard& GetBlackboard() { return m_Blackboard; }
     const Blackboard& GetBlackboard() const { return m_Blackboard; }
 

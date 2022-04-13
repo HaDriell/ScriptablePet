@@ -3,8 +3,16 @@
 #include <algorithm>
 
 const std::string JSON_SECTION_BLACKBOARD   = "blackboard";
-const std::string JSON_SECTION_DATA         = "data";
+const std::string JSON_SECTION_ELEMENTS     = "elements";
 
+ScriptablePet::~ScriptablePet()
+{
+    for (auto element : m_Elements)
+    {
+        delete element;
+    }
+    m_Elements.clear();
+} 
 
 void ScriptablePet::AddElement(PetElement* element)
 {
@@ -42,11 +50,24 @@ void ScriptablePet::Load(const json& container)
         m_Blackboard.Load(it.value());
     }
 
-    if (auto it = container.find(JSON_SECTION_DATA); it != container.end())
+    if (auto it = container.find(JSON_SECTION_ELEMENTS); it != container.end())
     {
-        for (auto element : m_Elements)
+        if (it->is_array())
         {
-            element->Load(it.value());
+            for (const json& data : *it)
+            {
+                if (Object* object = Object::Deserialize(data))
+                {
+                    if (PetElement* petElement = object->Cast<PetElement>())
+                    {
+                        AddElement(petElement);
+                    }
+                    else
+                    {
+                        delete object; // Error : WTF did we deserialize ?
+                    }
+                }
+            }
         }
     }
 }
@@ -56,11 +77,12 @@ void ScriptablePet::Save(json& container) const
     //Save Blackboard
     json& blackboard = container[JSON_SECTION_BLACKBOARD];
     m_Blackboard.Save(blackboard);
-
+    
     //Save Elements (Yes, they all share the same container, dirty isolation from Blackboard I know)
-    json& elements = container[JSON_SECTION_DATA];
+    json& containers = container[JSON_SECTION_ELEMENTS];
     for (auto element : m_Elements)
     {
-        element->Save(elements);
+        json& container = containers.emplace_back();
+        Object::Serialize(element, container);
     }
 }

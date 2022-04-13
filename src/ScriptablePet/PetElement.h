@@ -1,22 +1,19 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+
+#include "Core/Reflection/Reflection.h"
 
 class ScriptablePet;
 
-class PetElement
+class PetElement : public Object
 {
 public:
-    ~PetElement() { }
+    inline const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<PetElement>(); }
 
     void SetOwner(ScriptablePet* owner);
     ScriptablePet* GetOwner() const;
 
     virtual void Update() { }
-    virtual void Load(const json& container) { }
-    virtual void Save(json& container) { }
-
 private:
     ScriptablePet* m_Owner{ nullptr };
 };
