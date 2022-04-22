@@ -1,12 +1,14 @@
 #pragma once
 
-#include "Core/Reflection/Object.h"
 #include "Core/Reflection/ClassManager.h"
+#include "Core/Reflection/Object.h"
 
 template<class Class>
 class ClassDecl
 {
     static_assert(std::is_base_of_v<Object, Class>);
+
+
 public:
     [[nodiscard]] ClassDecl& Declare()
     {
@@ -29,6 +31,7 @@ public:
         };
         return *this;
     }
+
     
     [[nodiscard]] ClassDecl& Destructible()
     {

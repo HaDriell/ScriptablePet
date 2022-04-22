@@ -32,6 +32,6 @@ struct TypeInfo
     static_assert(std::is_const_v<T> == false);
 public:
     static constexpr std::string_view   Name = Private::GetTypeName<T>();
-    static constexpr uint32_t           Hash = FNV::Hash(Name);
+    static constexpr uint64_t           Hash = FNV::Hash(Name);
     static constexpr size_t             Size = sizeof(T);
 };

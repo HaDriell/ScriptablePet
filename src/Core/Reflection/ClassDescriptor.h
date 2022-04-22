@@ -2,6 +2,7 @@
 
 #include "Core/TypeInfo.h"
 
+#include <cstdint>
 #include <functional>
 #include <string_view>
 #include <vector>
@@ -15,14 +16,14 @@ struct ClassDescriptor
 
     const ClassDescriptor*  SuperClass{ nullptr };
     std::string_view        ClassName;
-    uint32_t                TypeID;
+    uint64_t                TypeID;
     size_t                  Size;
 
     Constructor             ConstructorFunction;
     Destructor              DestructorFunction;
 
 private:
-    ClassDescriptor(std::string_view className, uint32_t typeID, size_t size);
+    ClassDescriptor(std::string_view className, uint64_t typeID, size_t size);
 public:
     template<class Class>
     [[nodiscard]] static ClassDescriptor* Get()
