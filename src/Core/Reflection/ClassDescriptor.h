@@ -22,6 +22,15 @@ struct ClassDescriptor
     Constructor             ConstructorFunction;
     Destructor              DestructorFunction;
 
+    template<class Other>
+    bool IsSameAs() const;
+    
+    template<class Other>
+    bool IsTypeOf() const;
+    
+    bool IsConstructible() const { return !!ConstructorFunction; }
+    bool IsDestructible() const { return !!DestructorFunction; }
+
 private:
     ClassDescriptor(std::string_view className, uint64_t typeID, size_t size);
 public:
@@ -33,43 +42,25 @@ public:
     }
 };
 
-inline bool IsSameAs(const ClassDescriptor* self, const ClassDescriptor* other)
+bool IsSameAs(const ClassDescriptor* self, const ClassDescriptor* other);
+bool IsTypeOf(const ClassDescriptor* self, const ClassDescriptor* other);
+
+template<class Other>
+bool ClassDescriptor::IsTypeOf() const
 {
-    return self == other;
+    return ::IsTypeOf(this, ClassDescriptor::Get<Other>());
 }
 
 template<class Other>
-bool IsSameAs(const ClassDescriptor* self)
+bool ClassDescriptor::IsSameAs() const
 {
-    return IsSameAs(self, ClassDescriptor::Get<Other>());
+    return ::IsSameAs(this, ClassDescriptor::Get<Other>());
 }
 
 template<class Self, class Other>
 bool IsSameAs()
 {
     return IsSameAs(ClassDescriptor::Get<Self>(), ClassDescriptor::Get<Other>());   
-}
-
-inline bool IsTypeOf(const ClassDescriptor* self, const ClassDescriptor* other)
-{
-    const ClassDescriptor* current = self;
-
-    while (current != nullptr)
-    {
-        if (IsSameAs(current, other))
-        {
-            return true;
-        }
-        current = current->SuperClass;
-    }
-
-    return false;
-}
-
-template<class Other>
-bool IsTypeOf(const ClassDescriptor* self)
-{
-    return IsTypeOf(self, ClassDescriptor::Get<Other>());
 }
 
 template<class Self, class Other>

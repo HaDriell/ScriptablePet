@@ -12,8 +12,7 @@ public:
 
     void SetOwner(ScriptablePet* owner);
     ScriptablePet* GetOwner() const;
-
-    virtual void Update() { }
+    
 private:
     ScriptablePet* m_Owner{ nullptr };
 };

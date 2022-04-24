@@ -1,9 +1,10 @@
 #include "ScriptablePet/PetElement.h"
+#include "ScriptablePet/ScriptablePet.h"
 
+#include "Core/Reflection/Object.h"
 
 static auto g_PetElement_Decl = ClassDecl<PetElement>()
     .Super<Object>()
-    .Constructible()
     .Destructible()
     .Declare();
 

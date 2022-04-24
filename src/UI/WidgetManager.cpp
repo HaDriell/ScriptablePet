@@ -52,7 +52,7 @@ Widget* WidgetManager::GetWidget(const std::string& name) const
 
 void WidgetManager::Render()
 {
-    for (auto [_, widget] : m_Widgets)
+    for (const auto& [_, widget] : m_Widgets)
     {
         widget->Render();
     }

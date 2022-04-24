@@ -21,6 +21,10 @@ void ScriptablePetSubsystem::Initialize()
         int32_t ans = m_Pet.GetBlackboard().GetInteger("Answer");
         m_Pet.GetBlackboard().SetInteger("Answer", ans + 1);
     }
+    else
+    {
+        m_Pet.GetBlackboard().SetInteger("Answer", 42);
+    }
 }
 
 void ScriptablePetSubsystem::Shutdown()

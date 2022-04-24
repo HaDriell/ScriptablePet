@@ -2,55 +2,52 @@
 
 #include <algorithm>
 
-const std::string JSON_SECTION_BLACKBOARD   = "blackboard";
-const std::string JSON_SECTION_ELEMENTS     = "elements";
-
 ScriptablePet::~ScriptablePet()
 {
-    for (auto element : m_Elements)
+    for (auto element : m_Rules)
     {
         delete element;
     }
-    m_Elements.clear();
+    m_Rules.clear();
 } 
 
-void ScriptablePet::AddElement(PetElement* element)
+void ScriptablePet::AddRule(PetRule* rule)
 {
-    auto it = std::find(m_Elements.begin(), m_Elements.end(), element);
-    if (it == m_Elements.end())
+    auto it = std::find(m_Rules.begin(), m_Rules.end(), rule);
+    if (it == m_Rules.end())
     {
-        element->SetOwner(this);
-        m_Elements.push_back(element);
+        rule->SetOwner(this);
+        m_Rules.push_back(rule);
     }
 }
 
-void ScriptablePet::RemoveElement(PetElement* element)
+void ScriptablePet::RemoveRule(PetRule* rule)
 {
-    auto it = std::find(m_Elements.begin(), m_Elements.end(), element);
-    if (it != m_Elements.end())
+    auto it = std::find(m_Rules.begin(), m_Rules.end(), rule);
+    if (it != m_Rules.end())
     {
-        m_Elements.erase(it);
-        element->SetOwner(nullptr);
-        delete element;
+        m_Rules.erase(it);
+        rule->SetOwner(nullptr);
+        delete rule;
     }
 }
 
 void ScriptablePet::Update()
 {
-    for (auto element : m_Elements)
+    for (auto rule : m_Rules)
     {
-        element->Update();
+        rule->Evaluate();
     }
 }
 
 void ScriptablePet::Load(const json& container)
 {
-    if (auto it = container.find(JSON_SECTION_BLACKBOARD); it != container.end())
+    if (auto it = container.find("blackboard"); it != container.end())
     {
         m_Blackboard.Load(it.value());
     }
 
-    if (auto it = container.find(JSON_SECTION_ELEMENTS); it != container.end())
+    if (auto it = container.find("rules"); it != container.end())
     {
         if (it->is_array())
         {
@@ -58,9 +55,9 @@ void ScriptablePet::Load(const json& container)
             {
                 if (Object* object = Object::Deserialize(data))
                 {
-                    if (PetElement* petElement = object->Cast<PetElement>())
+                    if (PetRule* rule = object->Cast<PetRule>())
                     {
-                        AddElement(petElement);
+                        AddRule(rule);
                     }
                     else
                     {
@@ -75,14 +72,17 @@ void ScriptablePet::Load(const json& container)
 void ScriptablePet::Save(json& container) const
 {
     //Save Blackboard
-    json& blackboard = container[JSON_SECTION_BLACKBOARD];
+    json blackboard = json::object();
     m_Blackboard.Save(blackboard);
     
     //Save Elements (Yes, they all share the same container, dirty isolation from Blackboard I know)
-    json& containers = container[JSON_SECTION_ELEMENTS];
-    for (auto element : m_Elements)
+    json rules = json::array();
+    for (auto rule : m_Rules)
     {
-        json& container = containers.emplace_back();
-        Object::Serialize(element, container);
+        json& container = rules.emplace_back();
+        Object::Serialize(rule, container);
     }
+
+    container["blackboard"] = blackboard;
+    container["rules"] = rules;
 }

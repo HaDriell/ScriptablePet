@@ -18,7 +18,7 @@ public:
     template<class ToType>
     ToType* Cast()
     {
-        return IsTypeOf<ToType>(GetClassDescriptor()) ? static_cast<ToType*>(this) : nullptr;
+        return GetClassDescriptor()->IsTypeOf<ToType>() ? static_cast<ToType*>(this) : nullptr;
     }
 
     template<class ToType>

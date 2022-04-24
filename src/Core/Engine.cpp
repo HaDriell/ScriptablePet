@@ -11,7 +11,7 @@ namespace Engine
     bool s_Running = false;
     float s_DeltaTime = 0.0f;
 
-    constexpr int FrameRate = 60;
+    constexpr int s_FrameRate = 60;
 
     int Run(Application* application)
     {
@@ -34,7 +34,7 @@ namespace Engine
             //Update the application
             s_Application->Update();
 
-            std::this_thread::sleep_until(currentTimePoint + std::chrono::duration<std::chrono::steady_clock::rep, std::ratio<1, FrameRate>>(1));
+            std::this_thread::sleep_until(currentTimePoint + std::chrono::duration<std::chrono::steady_clock::rep, std::ratio<1, s_FrameRate>>(1));
         }
 
         s_Application->Stop();
