@@ -9,7 +9,6 @@ class Menu
 {
 public:
     Menu(const std::string& name = "");
-    ~Menu();
     
     bool AddItem(MenuItem* item);
     bool RemoveItem(MenuItem* item);

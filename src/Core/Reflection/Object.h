@@ -28,5 +28,7 @@ public:
     }
 
     static Object* Deserialize(const json& container);
+
+    static void Deserialize(const json& container, Object* instance);
     static void Serialize(const Object* object, json& container);
 };

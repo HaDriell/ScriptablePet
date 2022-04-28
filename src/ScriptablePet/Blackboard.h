@@ -10,12 +10,16 @@ using json = nlohmann::json;
 #include <string>
 #include <variant>
 
+#include "Core/Reflection/Reflection.h"
+
 using TValue = std::variant<bool, int32_t, float, std::string>;
 const TValue InvalidValue;
 
-class Blackboard
+class Blackboard : public Object
 {
 public:
+    inline const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<Blackboard>(); }
+    
     bool IsDefined(const std::string& variable) const;
     bool Undefine(const std::string& variable);
 
@@ -29,8 +33,8 @@ public:
     float GetFloat(const std::string& variable) const;
     std::string GetString(const std::string& variable) const;
 
-    void Load(const json& container);
-    void Save(json& container) const;
+    void Load(const json& data) override;
+    void Save(json& data) const override;
 
     void Clear();
 

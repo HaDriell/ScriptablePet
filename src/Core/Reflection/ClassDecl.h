@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Reflection/ClassManager.h"
 #include "Core/Reflection/Object.h"
 
 template<class Class>
@@ -10,12 +9,6 @@ class ClassDecl
 
 
 public:
-    [[nodiscard]] ClassDecl& Declare()
-    {
-        ClassManager::GetInstance()->AddClass(ClassDescriptor::Get<Class>());
-        return *this;
-    }
-
     template<class SuperClass>
     [[nodiscard]] ClassDecl& Super()
     {

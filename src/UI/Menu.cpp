@@ -5,12 +5,6 @@
 Menu::Menu(const std::string& name)
     : m_Name(name)
 {
-    //TODO : self register to Manager
-}
-
-Menu::~Menu()
-{
-    // TODO : self unregister to Manager
 }
 
 bool Menu::AddItem(MenuItem* item)

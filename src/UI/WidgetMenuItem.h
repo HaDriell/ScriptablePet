@@ -2,6 +2,7 @@
 
 #include <type_traits>
 
+#include "UI/UISubsystem.h"
 #include "UI/MenuItem.h"
 #include "UI/Widget.h"
 
@@ -14,7 +15,7 @@ public:
         : MenuItem(menuItemName)
     {
         m_Widget = new WIDGET(widgetName);
-        m_Widget->Register();
+        UI::Get().AddWidget(m_Widget);
     }
 
     WidgetMenuItem(const std::string& name)
@@ -24,20 +25,24 @@ public:
 
     ~WidgetMenuItem()
     {
-        m_Widget->Unregister();
-        delete m_Widget;
+        UI::Get().RemoveWidget(m_Widget);
+        //delete m_Widget; // TODO : since RemoveWidget is async now, we cannot delete like this anymore.
     }
 
 protected:
     void OnClick() override
     {
-        if (m_Widget->IsOpen())
+        switch (m_Widget->GetState())
         {
+        case Widget::State::Open:
             m_Widget->Close();
-        }
-        else
-        {
+            break;
+
+        case Widget::State::Closed:
             m_Widget->Open();
+            break;
+        default:
+            break;
         }
     }
 

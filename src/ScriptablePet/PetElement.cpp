@@ -5,8 +5,7 @@
 
 static auto g_PetElement_Decl = ClassDecl<PetElement>()
     .Super<Object>()
-    .Destructible()
-    .Declare();
+    .Destructible();
 
 void PetElement::SetOwner(ScriptablePet* owner)
 {

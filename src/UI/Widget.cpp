@@ -2,72 +2,90 @@
 
 #include <string>
 #include <imgui.h>
-#include "UI/WidgetManager.h"
+#include "UI/UIEvents.h"
 
-
+auto g_Widget_Decl = ClassDecl<Widget>()
+    .Super<Object>()
+    .Destructible();
 
 Widget::Widget(const std::string& name)
     : m_Name(name)
-    , m_Registered(false)
-    , m_Open(false)
+    , m_State(Widget::State::Closed)
 {
-}
-
-bool Widget::Register()
-{
-    if (!m_Registered)
-    {
-        m_Registered = WidgetManager::GetInstance().Register(this);
-        return m_Registered;
-    }
-    return false;
-}
-
-bool Widget::Unregister()
-{
-    if (m_Registered)
-    {
-        m_Registered = WidgetManager::GetInstance().Unregister(this);
-        return m_Registered;
-    }
-    return false;
 }
 
 void Widget::Open()
 {
-    if (m_Registered)
+    if (m_State == Widget::State::Closed)
     {
-        if (!m_Open)
-        {
-            m_Open = true;
-            OnOpen();
-        }
+        m_State = Widget::State::Opening;
     }
 }
 
 void Widget::Render()
 {
-    if (m_Registered)
+    if (ImGui::Begin(m_Name.c_str()))
     {
-        if (m_Open)
-        {
-            if (ImGui::Begin(m_Name.c_str(), &m_Open))
-            {
-                OnRender();
-            }
-            ImGui::End();
-        }
+        OnRender();
     }
+    ImGui::End();
 }
 
 void Widget::Close()
 {
-    if (m_Registered)
+    if (m_State == Widget::State::Open)
     {
-        if (m_Open)
-        {
-            m_Open = false;
-            OnClose();
-        }
+        m_State = Widget::State::Closing;
     }
+}
+
+void Widget::Update()
+{
+    switch (m_State)
+    {
+    case Widget::State::Opening:
+    {
+        OnOpen();
+
+        WidgetOpenedEvent event;
+        event.SetWidget(this);
+        event.Broadcast();
+
+        m_State = Widget::State::Open;
+        break;
+    }
+    case Widget::State::Open:
+    {
+        Render();
+        break;
+    }
+    case Widget::State::Closing:
+    {
+        WidgetClosedEvent event;
+        event.SetWidget(this);
+        event.Broadcast();
+
+        OnClose();
+
+        m_State = Widget::State::Closed;
+        break;
+    }    
+    default:
+        break;
+    }
+}
+
+void Widget::OnOpen()
+{
+
+}
+
+void Widget::OnRender()
+{
+
+}
+
+void Widget::OnClose()
+{
+    
 }

@@ -1,22 +1,20 @@
 #include "Core/Reflection/Object.h"
 
 #include "Core/Reflection/ClassDecl.h"
-#include "Core/Reflection/ClassManager.h"
 
 const auto g_Object_Decl = ClassDecl<Object>()
-    .Destructible()
-    .Declare();
+    .Destructible();
 
 Object* Object::Deserialize(const json& container)
 {
-    auto typeID = container.find("typeID"); 
-    if (typeID == container.end() || !typeID->is_number_unsigned())
+    auto className = container.find("className"); 
+    if (className == container.end() || !className->is_string())
     {
-        //Error : missing or invalid typeID
+        //Error : missing or invalid className
         return nullptr;
     }
     
-    const ClassDescriptor* classDescriptor = ClassManager::GetInstance()->GetClassDescriptor(typeID->get<uint32_t>());
+    const ClassDescriptor* classDescriptor = ClassDescriptor::GetClassByName(className->get<std::string>());
     if (classDescriptor == nullptr)
     {
         //Error : unknown ClassDescriptor
@@ -41,8 +39,40 @@ Object* Object::Deserialize(const json& container)
     return instance;
 }
 
+void Object::Deserialize(const json& container, Object* instance)
+{
+    auto className = container.find("className");
+    if (className == container.end() || !className->is_string())
+    {
+        //Error : missing or invalid className
+        return;
+    }
+    
+    const ClassDescriptor* classDescriptor = ClassDescriptor::GetClassByName(className->get<std::string>());
+    if (classDescriptor == nullptr)
+    {
+        //Error : unknown ClassDescriptor
+        return;
+    }
+
+    if (!IsTypeOf(instance->GetClassDescriptor(), classDescriptor))
+    {
+        //Error : Serialized type is not compatible with provided instance
+        return;
+    }
+
+    auto data = container.find("data");
+    if (data != container.end())
+    {
+        instance->Load(*data);
+    }
+}
+
 void Object::Serialize(const Object* object, json& container)
 {
-    container["typeID"] = object->GetClassDescriptor()->TypeID;
-    object->Save(container["data"]);
+    json data;
+    object->Save(data);
+
+    container["className"] = object->GetClassDescriptor()->ClassName;
+    container["data"] = data;
 }

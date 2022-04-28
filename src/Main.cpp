@@ -3,8 +3,12 @@
 #include "Core/Engine.h"
 
 #include "ScriptablePet/ScriptablePetSubsystem.h"
+
+#include "UI/UISubsystem.h"
+
 #include "Window/WindowSubsystem.h"
 #include "Window/WindowChannel.h"
+
 
 #include <iostream>
 
@@ -61,25 +65,12 @@ protected:
         container.RegisterManaged<WindowSubsystem>();
         container.RegisterManaged<ScriptablePetSubsystem>();
         container.RegisterManaged<MainSubsystem>();
+        container.RegisterManaged<UISubsystem>();
     }
 };
 
-template<class T>
-void ShowTypeInfo()
-{
-    std::cout << "Type (0x" << std::hex << TypeInfo<T>::Hash << std::dec << ") ";
-    std::cout << "Name : " << TypeInfo<T>::Name;
-    std::cout << "\n";
-}
-
 int main()
 {
-    ShowTypeInfo<uint32_t>();
-    ShowTypeInfo<Application>();
-    ShowTypeInfo<void(Application::*)()>();
-    ShowTypeInfo<void(*)()>();
-    ShowTypeInfo<void()>();
-    
     MainApplication application;
     return Engine::Run(&application);
 }

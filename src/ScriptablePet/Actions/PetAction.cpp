@@ -2,5 +2,4 @@
 
 auto g_PetAction_Decl = ClassDecl<PetAction>()
     .Super<PetElement>()
-    .Destructible()
-    .Declare();
+    .Destructible();

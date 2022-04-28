@@ -42,18 +42,18 @@ void ScriptablePet::Update()
 
 void ScriptablePet::Load(const json& container)
 {
-    if (auto it = container.find("blackboard"); it != container.end())
+    if (auto it = container.find("blackboard"); it != container.end() && it->is_object())
     {
-        m_Blackboard.Load(it.value());
+        Object::Deserialize(it.value(), &m_Blackboard);
     }
 
     if (auto it = container.find("rules"); it != container.end())
     {
         if (it->is_array())
         {
-            for (const json& data : *it)
+            for (const json& serializedRule : *it)
             {
-                if (Object* object = Object::Deserialize(data))
+                if (Object* object = Object::Deserialize(serializedRule))
                 {
                     if (PetRule* rule = object->Cast<PetRule>())
                     {
@@ -72,17 +72,16 @@ void ScriptablePet::Load(const json& container)
 void ScriptablePet::Save(json& container) const
 {
     //Save Blackboard
-    json blackboard = json::object();
-    m_Blackboard.Save(blackboard);
-    
-    //Save Elements (Yes, they all share the same container, dirty isolation from Blackboard I know)
+    json blackboard;
+    Object::Serialize(&m_Blackboard, blackboard);
+    container["blackboard"] = blackboard;
+
+    //Save PetRules
     json rules = json::array();
     for (auto rule : m_Rules)
     {
         json& container = rules.emplace_back();
         Object::Serialize(rule, container);
     }
-
-    container["blackboard"] = blackboard;
     container["rules"] = rules;
 }

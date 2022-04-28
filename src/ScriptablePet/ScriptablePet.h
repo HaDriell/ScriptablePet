@@ -18,6 +18,8 @@ public:
 
     void AddRule(PetRule* rule);
     void RemoveRule(PetRule* rule);
+    const std::vector<PetRule*>& GetRules() const { return m_Rules; }
+    std::vector<PetRule*>& GetRules() { return m_Rules; }
 
     void Update();
     void Load(const json& container);

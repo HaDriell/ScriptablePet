@@ -1,8 +1,12 @@
 #include "ScriptablePet/Blackboard.h"
 
 #include <nlohmann/json.hpp>
-
 using json = nlohmann::json;
+
+auto g_Blackboard_Decl = ClassDecl<Blackboard>()
+    .Super<Object>()
+    .Constructible()
+    .Destructible();
 
 bool Blackboard::IsDefined(const std::string& variable) const
 {
@@ -68,39 +72,26 @@ std::string Blackboard::GetString(const std::string& variable) const
     return "";
 }
 
-void Blackboard::Load(const json& container)
+void Blackboard::Load(const json& data)
 {
     Clear();
-    for (auto it = container.begin(); it != container.end(); ++it)
+    for (auto it = data.begin(); it != data.end(); ++it)
     {
-        if (it.value().is_boolean()) SetBoolean(it.key(), it.value());
-        else if (it.value().is_number_integer()) SetInteger(it.key(), it.value());
-        else if (it.value().is_number_float()) SetFloat(it.key(), it.value());
-        else if (it.value().is_string()) SetString(it.key(), it.value());
+        if (it.value().is_boolean())                SetBoolean(it.key(), it.value());
+        else if (it.value().is_number_integer())    SetInteger(it.key(), it.value());
+        else if (it.value().is_number_float())      SetFloat(it.key(), it.value());
+        else if (it.value().is_string())            SetString(it.key(), it.value());
     }
 }
 
-void Blackboard::Save(json& container) const
+void Blackboard::Save(json& data) const
 {
-    struct TValueSerializer
-    {
-        TValueSerializer(json& container, const std::string& key)
-            : m_Container(container)
-            , m_Key(key)
-        {}
-
-        json& m_Container;
-        const std::string& m_Key;
-
-        void operator()(const bool& value) const { m_Container[m_Key] = value; }
-        void operator()(const int32_t& value) const { m_Container[m_Key] = value; }
-        void operator()(const float& value) const { m_Container[m_Key] = value; }
-        void operator()(const std::string& value) const { m_Container[m_Key] = value; }        
-    };
-
     for (const auto& [key, value] : m_Data)
     {
-        std::visit(TValueSerializer(container, key), value);
+        if (std::holds_alternative<bool>(value))        data[key] = std::get<bool>(value);
+        if (std::holds_alternative<int32_t>(value))     data[key] = std::get<int32_t>(value);
+        if (std::holds_alternative<float>(value))       data[key] = std::get<float>(value);
+        if (std::holds_alternative<std::string>(value)) data[key] = std::get<std::string>(value);
     }
 }
 

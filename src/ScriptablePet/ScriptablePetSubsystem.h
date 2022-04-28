@@ -5,6 +5,7 @@
 
 class ScriptablePetSubsystem : public Subsystem
 {
+public:
     void Initialize() override;
     void Shutdown() override;
 
