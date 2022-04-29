@@ -8,10 +8,9 @@
 #include "ScriptablePet/Actions/PetAction.h"
 #include "ScriptablePet/Conditions/PetCondition.h"
 
-class PetRule : public PetElement
+class PetRule : public Extends<PetElement, PetRule>
 {
 public:
-    const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<PetRule>(); }
     ~PetRule();
 
     void Load(const json& data) override;

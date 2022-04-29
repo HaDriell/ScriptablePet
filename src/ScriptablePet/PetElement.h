@@ -5,11 +5,9 @@
 
 class ScriptablePet;
 
-class PetElement : public Object
+class PetElement : public Extends<Object, PetElement>
 {
 public:
-    inline const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<PetElement>(); }
-
     void SetOwner(ScriptablePet* owner);
     ScriptablePet* GetOwner() const;
     

@@ -2,11 +2,8 @@
 
 #include "UI/Editor.h"
 
-class PetEditor : public Editor
+class PetEditor : public Extends<Editor, PetEditor>
 {
-public:
-    const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<PetEditor>(); }
-
 protected:
     void OnRender() override;
 };

@@ -15,11 +15,9 @@ using json = nlohmann::json;
 using TValue = std::variant<bool, int32_t, float, std::string>;
 const TValue InvalidValue;
 
-class Blackboard : public Object
+class Blackboard : public Extends<Object, Blackboard>
 {
 public:
-    inline const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<Blackboard>(); }
-    
     bool IsDefined(const std::string& variable) const;
     bool Undefine(const std::string& variable);
 

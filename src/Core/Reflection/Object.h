@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -31,4 +33,13 @@ public:
 
     static void Deserialize(const json& container, Object* instance);
     static void Serialize(const Object* object, json& container);
+};
+
+template<class BaseClass, class DerivedClass>
+class Extends : public BaseClass
+{
+    static_assert(std::is_base_of_v<Object, BaseClass>);
+public:
+    using Super = BaseClass;
+    inline const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<DerivedClass>(); }
 };

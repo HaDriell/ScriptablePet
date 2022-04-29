@@ -6,11 +6,9 @@
 
 #include "Core/Reflection/Reflection.h"
 
-class Widget : public Object
+class Widget : public Extends<Object, Widget>
 {
 public:
-    const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<Widget>(); }
-
     enum class State : uint8_t
     {
         Closed,
