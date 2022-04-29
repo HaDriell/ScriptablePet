@@ -24,58 +24,64 @@ void PetEditor::OnRender()
 
     if (ImGui::CollapsingHeader("Rules", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginTable("##Rules", 4))
+        size_t index = 0;
+        for (PetRule* rule : pet.GetRules())
         {
-            ImGui::TableSetupColumn("+/-", ImGuiTableColumnFlags_WidthFixed, 24);
-            ImGui::TableSetupColumn("Name");
-            ImGui::TableSetupColumn("Conditions");
-            ImGui::TableSetupColumn("Actions");
-            ImGui::TableHeadersRow();
-
-            PetRule* removedRule { nullptr };
-            for (uint32_t i = 0; i < pet.GetRules().size(); ++i)
-            {
-                PetRule* rule = pet.GetRules()[i];
-                ImGui::PushID(i);
-
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                if (ImGui::Button("-"))
-                {
-                    removedRule = rule;
-                }
-
-                ImGui::TableNextColumn();
-                ImGui::InputText("##RuleName", &rule->GetName());
-                
-                ImGui::TableNextColumn();
-                // Conditions
-                ImGui::Text("%llu Conditions", rule->GetConditions().size());
-
-                ImGui::TableNextColumn();
-                // Actions
-                ImGui::Text("%llu Action", rule->GetActions().size());
-
-                ImGui::PopID();
-            }
-            pet.RemoveRule(removedRule);
-
-            //Footer Row for Rule creation
-            {            
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                if (ImGui::Button("+"))
-                {
-                    PetRule* rule = new PetRule();
-                    rule->SetName("New Rule");
-                    pet.AddRule(rule);
-                }
-                ImGui::TableNextColumn();
-                ImGui::TableNextColumn();
-                ImGui::TableNextColumn();
-            }
-
-            ImGui::EndTable();
+            ImGui::PushID(index);
+            ImGui::Indent(16.0f);
+            RenderPetRule(rule);
+            ImGui::Unindent(16.0f);
+            ImGui::PopID();
         }
     }
+}
+
+void PetEditor::RenderPetRule(PetRule* rule)
+{
+    if (ImGui::CollapsingHeader(rule->GetName().c_str()))
+    {
+        ImGui::Indent(16.0f);
+        ImGui::PushID(rule);
+
+        if (ImGui::CollapsingHeader("Conditions"))
+        {
+            size_t index = 0; 
+            for (PetCondition* condition : rule->GetConditions())
+            {
+                ImGui::PushID(index);
+                RenderPetCondition(condition);
+                ImGui::PopID();
+                index++;
+            }
+            
+            //TODO : Options (Popup ?) to create PetConditions
+        }
+
+        if (ImGui::CollapsingHeader("Actions"))
+        {
+            size_t index = 0; 
+            for (PetAction* action : rule->GetActions())
+            {
+                ImGui::PushID(index);
+                RenderPetAction(action);
+                ImGui::PopID();
+                index++;
+            }
+
+            //TODO : Options (Popup ?) to create PetActions
+        }
+
+        ImGui::PopID();
+        ImGui::Unindent(16.0f);
+    }
+}
+
+void PetEditor::RenderPetAction(PetAction* action)
+{
+    ImGui::Text("PetAction has no renderer yet !");
+}
+
+void PetEditor::RenderPetCondition(PetCondition* condition)
+{
+    ImGui::Text("PetCondition has no renderer yet !");
 }
