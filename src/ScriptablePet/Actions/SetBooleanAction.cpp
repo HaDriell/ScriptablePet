@@ -18,7 +18,7 @@ void SetBooleanAction::Load(const json& data)
         m_Variable = it->get<std::string>();
     }
 
-    if (auto it = data.find("variable"); it != data.end() && it->is_boolean())
+    if (auto it = data.find("value"); it != data.end() && it->is_boolean())
     {
         m_Value = it->get<bool>();
     }

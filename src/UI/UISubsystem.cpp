@@ -9,6 +9,8 @@
 
 void UISubsystem::Initialize()
 {
+    InitializeStyle();
+
     m_WindowRenderCallback.Init(this, &UISubsystem::HandleWindowRenderEvent);
     m_EventListener.ConnectHandler(&m_WindowRenderCallback);
     m_EventListener.JoinChannel(WindowChannel::GetChannel());
@@ -25,7 +27,6 @@ void UISubsystem::Initialize()
             m_ManagedEditors.push_back(menuItem);
         }
     }
-    
 }
 
 void UISubsystem::Shutdown()
@@ -119,6 +120,13 @@ void UISubsystem::RemoveWidget(Widget* widget)
 {
     m_WidgetsToRemove.emplace_back(widget);
 }
+
+void UISubsystem::InitializeStyle()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("resources/fonts/Ubuntu-Light.ttf", 14.0f);
+}
+
 
 void UISubsystem::HandleWindowRenderEvent(const WindowRenderEvent& event)
 {

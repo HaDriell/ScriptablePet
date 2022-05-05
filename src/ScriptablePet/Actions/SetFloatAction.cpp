@@ -18,7 +18,7 @@ void SetFloatAction::Load(const json& data)
         m_Variable = it->get<std::string>();
     }
 
-    if (auto it = data.find("variable"); it != data.end() && it->is_number())
+    if (auto it = data.find("value"); it != data.end() && it->is_number())
     {
         m_Value = it->get<float>();
     }

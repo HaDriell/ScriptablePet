@@ -18,7 +18,7 @@ void SetStringAction::Load(const json& data)
         m_Variable = it->get<std::string>();
     }
 
-    if (auto it = data.find("variable"); it != data.end() && it->is_string())
+    if (auto it = data.find("value"); it != data.end() && it->is_string())
     {
         m_Value = it->get<std::string>();
     }

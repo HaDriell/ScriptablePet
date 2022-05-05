@@ -34,6 +34,7 @@ public:
     void RemoveWidget(Widget* widget);
 
 private:
+    void InitializeStyle();
     void HandleWindowRenderEvent(const WindowRenderEvent& event);
 
 private:
