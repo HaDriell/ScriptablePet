@@ -4,6 +4,9 @@
 
 #include "ScriptablePet/ScriptablePetSubsystem.h"
 
+#include "ScriptablePet/Actions/SetBooleanAction.h"
+#include "ScriptablePet/Conditions/IsBooleanEqualCondition.h"
+
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
@@ -24,14 +27,11 @@ void PetEditor::OnRender()
 
     if (ImGui::CollapsingHeader("Rules", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        size_t index = 0;
         for (PetRule* rule : pet.GetRules())
         {
-            ImGui::PushID(index);
             ImGui::Indent(16.0f);
             RenderPetRule(rule);
             ImGui::Unindent(16.0f);
-            ImGui::PopID();
         }
     }
 }
@@ -40,39 +40,43 @@ void PetEditor::RenderPetRule(PetRule* rule)
 {
     if (ImGui::CollapsingHeader(rule->GetName().c_str()))
     {
-        ImGui::Indent(16.0f);
         ImGui::PushID(rule);
-
-        if (ImGui::CollapsingHeader("Conditions"))
+        ImGui::Columns(2);
+        for (size_t index = 0; index < std::max(rule->GetConditions().size(), rule->GetActions().size()); ++index)
         {
-            size_t index = 0; 
-            for (PetCondition* condition : rule->GetConditions())
+            if (index < rule->GetConditions().size())
             {
-                ImGui::PushID(index);
+                PetCondition* condition = rule->GetConditions()[index];
+                ImGui::PushID(condition);
                 RenderPetCondition(condition);
                 ImGui::PopID();
-                index++;
             }
-            
-            //TODO : Options (Popup ?) to create PetConditions
-        }
-
-        if (ImGui::CollapsingHeader("Actions"))
-        {
-            size_t index = 0; 
-            for (PetAction* action : rule->GetActions())
+            ImGui::NextColumn();
+            if (index < rule->GetActions().size())
             {
-                ImGui::PushID(index);
+                PetAction* action = rule->GetActions()[index];
+                ImGui::PushID(action);
                 RenderPetAction(action);
                 ImGui::PopID();
-                index++;
             }
-
-            //TODO : Options (Popup ?) to create PetActions
+            ImGui::NextColumn();
         }
 
+        //TODO : Replace with actual Popup
+        if (ImGui::Button("Add PetCondition..."))
+        {
+            rule->AddCondition(new IsBooleanEqualCondition);
+        }
+        
+        ImGui::NextColumn();
+        //TODO : Replace with actual Popup
+        if (ImGui::Button("Add PetAction..."))
+        {
+            rule->AddAction(new SetBooleanAction);
+        }
+        ImGui::NextColumn();
+        ImGui::Columns();
         ImGui::PopID();
-        ImGui::Unindent(16.0f);
     }
 }
 

@@ -3,10 +3,8 @@
 
 #include "ScriptablePet/PetElement.h"
 
-class PetCondition : public PetElement
+class PetCondition : public Extends<PetElement, PetCondition>
 {
-
 public:
-    inline const ClassDescriptor* GetClassDescriptor() const override { return ClassDescriptor::Get<PetCondition>(); }
     virtual bool IsVerified() const = 0;
 };
